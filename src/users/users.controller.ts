@@ -17,8 +17,8 @@ import {
   UpdateUserRequestDto,
 } from './dtos/user.request.dto';
 import * as bcrypt from 'bcrypt';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { Public } from 'src/common/decorators/public.decorator';
+import { AuthGuard } from '../auth/auth.guard';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('users')
 @UseGuards(AuthGuard)

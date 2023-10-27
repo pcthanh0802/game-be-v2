@@ -1,5 +1,5 @@
-import { Game } from 'src/games/entities/games.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Game } from '../../games/entities/games.entity';
+import { User } from '../../users/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

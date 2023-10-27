@@ -10,11 +10,11 @@ import {
   ManyToMany,
 } from 'typeorm';
 import { GameSysReq } from './gameSysReq.entity';
-import { Genre } from 'src/genres/entities/genre.entity';
-import { Developer } from 'src/developers/entities/developer.entity';
-import { BillingDetails } from 'src/billings/entities/billing.entity';
-import { Rating } from 'src/ratings/entities/rating.entity';
-import { SaleDetailsGame } from 'src/sales/entities/salePromotion.entity';
+import { Genre } from '../../genres/entities/genre.entity';
+import { Developer } from '../../developers/entities/developer.entity';
+import { BillingDetails } from '../../billings/entities/billing.entity';
+import { Rating } from '../../ratings/entities/rating.entity';
+import { SaleDetailsGame } from '../../sales/entities/salePromotion.entity';
 
 @Entity('game')
 export class Game extends BaseEntity {

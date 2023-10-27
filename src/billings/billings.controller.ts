@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { BillingsService } from './billings.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { CreateBillingDto } from './dtos/CreateBilling.dto';
-import { makeSerialKey } from 'src/shared/helpers/serialKeyGenerator';
+import { makeSerialKey } from '../shared/helpers/serialKeyGenerator';
 
 @Controller('billings')
 @UseGuards(AuthGuard)

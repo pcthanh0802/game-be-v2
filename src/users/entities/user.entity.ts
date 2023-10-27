@@ -1,5 +1,5 @@
-import { Billing } from 'src/billings/entities/billing.entity';
-import { Rating } from 'src/ratings/entities/rating.entity';
+import { Billing } from '../../billings/entities/billing.entity';
+import { Rating } from '../../ratings/entities/rating.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

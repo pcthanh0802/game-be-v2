@@ -2,7 +2,7 @@ import { Get, Param, Req, UseGuards } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { LessThanOrEqual, Like, MoreThanOrEqual } from 'typeorm';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('games')
 export class GamesController {

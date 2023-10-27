@@ -1,4 +1,4 @@
-import { Game } from 'src/games/entities/games.entity';
+import { Game } from '../../games/entities/games.entity';
 import { Entity, PrimaryColumn, Column, OneToMany, BaseEntity } from 'typeorm';
 
 @Entity('developer')
