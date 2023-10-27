@@ -1,0 +1,7 @@
+{
+  "editor.formatOnSave": true,
+  "editor.fontSize": 13,
+  "editor.tabSize": 2,
+  "editor.formatOnSaveMode": "file",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
