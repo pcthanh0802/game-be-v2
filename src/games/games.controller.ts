@@ -28,7 +28,6 @@ export class GamesController {
       where: filterQuery,
       relations: {
         genres: true,
-        ratings: true,
       },
       skip: skipAmount,
       take: 10,
