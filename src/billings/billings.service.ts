@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { BaseService } from 'src/shared/services/base.service';
-import { Billing, BillingDetails } from './entities/billing.entity';
+import { BaseService } from '../shared/services/base.service';
+import { Billing } from './entities/billing.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 

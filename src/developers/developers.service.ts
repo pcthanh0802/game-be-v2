@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Developer } from './entities/developer.entity';
-import { BaseService } from 'src/shared/services/base.service';
+import { BaseService } from '../shared/services/base.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
