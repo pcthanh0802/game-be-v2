@@ -38,13 +38,22 @@ export class GamesController {
   async getGameInfo(@Param('gameId') gameId: number) {
     const currentDate = new Date();
     const res = await this.gameService.findOne({
+      select: {
+        ratings: {
+          id: true,
+          ratingStar: true,
+          comment: true,
+          ratingDateTime: true,
+          user: { username: true },
+        },
+      },
       where: {
         id: gameId,
       },
       relations: {
         developer: true,
         genres: true,
-        ratings: true,
+        ratings: { user: true },
         systemRequirements: true,
       },
     });
