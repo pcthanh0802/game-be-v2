@@ -12,7 +12,6 @@ export class GamesController {
   async find(@Req() req) {
     const { genre, name, page } = req.query;
     const skipAmount = page ? +page * 10 : 0;
-    console.log(skipAmount);
     const filterQuery = {};
 
     if (genre) {
@@ -24,7 +23,7 @@ export class GamesController {
       filterQuery['name'] = Like(`%${name}%`);
     }
 
-    return await this.gameService.find({
+    const findResult = await this.gameService.find({
       where: filterQuery,
       relations: {
         genres: true,
@@ -32,6 +31,44 @@ export class GamesController {
       skip: skipAmount,
       take: 10,
     });
+
+    const discounts = [];
+    const currentDate = new Date();
+    for (const game of findResult) {
+      const discount = await this.gameService.findOne({
+        select: {
+          saleDetails: {
+            discountRate: true,
+            salePromotion: {
+              startDate: true,
+              endDate: true,
+            },
+          },
+        },
+        where: {
+          id: game.id,
+          saleDetails: {
+            salePromotion: {
+              startDate: LessThanOrEqual(currentDate),
+              endDate: MoreThanOrEqual(currentDate),
+            },
+          },
+        },
+        relations: { saleDetails: { salePromotion: true } },
+      });
+
+      if (discount) {
+        discounts.push(discount.saleDetails);
+      } else {
+        discounts.push([]);
+      }
+    }
+
+    const res = findResult.map((game, index) => {
+      return { ...game, saleDetails: discounts[index] };
+    });
+
+    return res;
   }
 
   @Get('/getGameInfo/:gameId')

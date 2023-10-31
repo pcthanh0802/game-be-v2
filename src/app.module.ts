@@ -25,7 +25,7 @@ import { DevelopersModule } from './developers/developers.module';
       database: process.env.DATABASE_SCHEMA,
       autoLoadEntities: true,
       synchronize: false,
-      logging: true,
+      // logging: true,
     }),
     GlobalModule,
     AuthModule,
