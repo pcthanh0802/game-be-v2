@@ -11,7 +11,7 @@ export class GamesController {
   @Get()
   async find(@Req() req) {
     const { genre, name, page } = req.query;
-    const skipAmount = page ? +page * 10 : 0;
+    const skipAmount = page ? +page * 27 : 0;
     const filterQuery = {};
 
     if (genre) {
@@ -29,7 +29,7 @@ export class GamesController {
         genres: true,
       },
       skip: skipAmount,
-      take: 10,
+      take: 27,
     });
 
     const discounts = [];
