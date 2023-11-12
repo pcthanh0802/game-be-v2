@@ -1,8 +1,14 @@
-import { Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Get, Post, Param, Req, UseGuards, HttpCode, HttpStatus, Body } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { LessThanOrEqual, Like, MoreThanOrEqual } from 'typeorm';
 import { AuthGuard } from '../auth/auth.guard';
+import {
+  UploadGameDto,
+} from './dtos/game.request.dto';
+import { S3Client,  PutObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
 
 @Controller('games')
 export class GamesController {
@@ -154,5 +160,51 @@ export class GamesController {
         },
       },
     });
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post('uploadGame')
+  async uploadGame(
+    @Req() req,
+    @Body() uploadGameDto: UploadGameDto,
+  ) {
+    const { id = 1 } = req['user'] || {};
+    const s3 = new S3Client({
+      apiVersion: '2006-03-01',
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+      region: process.env.AWS_REGION,
+    });
+
+    const objectKey = 'games/' + uploadGameDto['name'].replaceAll(' ', '-') + uploadGameDto['fileExtension'];
+    const ContentType = uploadGameDto['contentType']
+
+    // Set the expiration time for the pre-signed URL (in seconds)
+    const expiresIn = 30; // 1 hour
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: objectKey,
+      ContentType,
+    };
+    const command = new PutObjectCommand(params);
+    const url = await getSignedUrl(s3, command, { expiresIn });
+
+    const game = {
+      name: uploadGameDto.name,
+      description: uploadGameDto.description,
+      price: uploadGameDto.price,
+      dev: id,
+      releaseDate: new Date(),
+      url: objectKey,
+    };
+
+    const insertObj = await this.gameService.create(game);
+
+    return {
+      ...insertObj,
+      uploadUrl: url,
+    };
   }
 }

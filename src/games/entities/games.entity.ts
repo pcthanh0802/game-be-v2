@@ -33,6 +33,9 @@ export class Game extends BaseEntity {
   @Column({ type: 'int', nullable: false, default: 0 })
   price: number;
 
+  @Column({ type: 'text', nullable: true })
+  url: string;
+
   @ManyToOne(() => Developer, (developer) => developer.games, {
     nullable: false,
     cascade: true,
