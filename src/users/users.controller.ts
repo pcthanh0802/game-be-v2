@@ -42,7 +42,7 @@ export class UsersController {
     const hashedPassword = await bcrypt.hash(user.password, this.saltRounds);
     const insertObj = await this.userService.create({
       ...user,
-      password: hashedPassword,
+      password: hashedPassword
     });
 
     return insertObj;

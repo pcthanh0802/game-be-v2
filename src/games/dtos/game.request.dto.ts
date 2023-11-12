@@ -19,4 +19,8 @@ export class UploadGameDto {
   @IsString()
   @IsNotEmpty()
   contentType: string;
+
+  @IsString()
+  @IsNotEmpty()
+  devId: number;
 }
