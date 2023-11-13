@@ -142,6 +142,13 @@ export class GamesController {
         Key: res.url,
       };
 
+      console.log({
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        region: process.env.AWS_REGION,
+        Bucket: process.env.AWS_BUCKET_NAME,
+        s3,
+      })
       const command = new GetObjectCommand(params);
       res.url = await getSignedUrl(s3, command, { expiresIn: 30 });
     }
