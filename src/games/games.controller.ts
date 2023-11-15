@@ -70,8 +70,36 @@ export class GamesController {
       }
     }
 
+    const s3 = new S3Client({
+      apiVersion: '2006-03-01',
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+      region: process.env.AWS_REGION,
+    });
+
+    const thumbnailUrls = await Promise.all(
+      findResult.map(item => {
+        if (item.thumbnailUrl) {
+          const params = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: item.thumbnailUrl,
+          };
+
+          const command = new GetObjectCommand(params);
+          return getSignedUrl(s3, command, { expiresIn: 3600 });
+        }
+        return null;
+      })
+    );
+
     const res = findResult.map((game, index) => {
-      return { ...game, saleDetails: discounts[index] };
+      return {
+        ...game,
+        saleDetails: discounts[index],
+        thumbnailUrl: thumbnailUrls[index],
+      };
     });
 
     return res;
@@ -127,23 +155,33 @@ export class GamesController {
       res.saleDetails = discount.saleDetails;
     }
 
-    if (res?.url) {
-      const s3 = new S3Client({
-        apiVersion: '2006-03-01',
-        credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        },
-        region: process.env.AWS_REGION,
-      });
+    const s3 = new S3Client({
+      apiVersion: '2006-03-01',
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+      region: process.env.AWS_REGION,
+    });
 
+    if (res?.thumbnailUrl) {
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: res.url,
+        Key: res.thumbnailUrl,
       };
 
       const command = new GetObjectCommand(params);
-      res.url = await getSignedUrl(s3, command, { expiresIn: 30 });
+      res.thumbnailUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    }
+
+    if (res?.gameUrl) {
+      const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: res.gameUrl,
+      };
+
+      const command = new GetObjectCommand(params);
+      res.gameUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
     }
 
     return res;
@@ -197,16 +235,10 @@ export class GamesController {
       region: process.env.AWS_REGION,
     });
 
-    const objectKey = 'games/' + uploadGameDto['name'].replaceAll(' ', '-') + uploadGameDto['fileExtension'];
-    const ContentType = uploadGameDto['contentType']
-
-    // Set the expiration time for the pre-signed URL (in seconds)
-    const expiresIn = 30; // 1 hour
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: objectKey,
-      ContentType,
-    };
+    const gameObjectKey = 'games/' + uploadGameDto['name'].replaceAll(' ', '-') + uploadGameDto['gameExtension'];
+    const thumnailObjectKey = 'thumbnails/' + uploadGameDto['name'].replaceAll(' ', '-') + uploadGameDto['thumbnailExtension'];
+    const gameContentType = uploadGameDto['gameContentType'];
+    const thumnailContentType = uploadGameDto['thumbnailContentType'];
 
     const game = {
       name: uploadGameDto.name,
@@ -214,7 +246,8 @@ export class GamesController {
       price: uploadGameDto.price,
       developer: id || 1,
       releaseDate: new Date(),
-      url: objectKey,
+      gameUrl: gameObjectKey,
+      thumbnailUrl: thumnailObjectKey,
     };
 
     const insertObj = await this.gameService.create({
@@ -222,12 +255,30 @@ export class GamesController {
       developer: 1,
     });
 
+    // Set the expiration time for the pre-signed URL (in seconds)
+    const expiresIn = 3600; // 1 hour
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: gameObjectKey,
+      ContentType: gameContentType,
+    };
+
+    const uploadThumbnailParams = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: thumnailObjectKey,
+      ContentType: thumnailContentType,
+    };
+
     const command = new PutObjectCommand(params);
-    const url = await getSignedUrl(s3, command, { expiresIn });
+    const uploadThumbnailCommand = new PutObjectCommand(uploadThumbnailParams);
+
+    const uploadGameurl = await getSignedUrl(s3, command, { expiresIn });
+    const uploadThumbnailUrl = await getSignedUrl(s3, uploadThumbnailCommand, { expiresIn });
 
     return {
       ...insertObj,
-      uploadUrl: url,
+      uploadGameurl,
+      uploadThumbnailUrl,
     };
   }
 }

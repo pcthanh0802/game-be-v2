@@ -9,7 +9,9 @@ export class GameDto {
 
   releaseDate: Date;
 
-  url: string;
+  gameUrl: string;
+
+  thumbnailUrl: string;
 
   devId: number;
 }

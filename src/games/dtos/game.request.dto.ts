@@ -7,7 +7,11 @@ export class UploadGameDto {
 
   @IsString()
   @IsNotEmpty()
-  fileExtension: string;
+  gameExtension: string;
+
+  @IsString()
+  @IsNotEmpty()
+  gameContentType: string;
 
   @IsString()
   @IsNotEmpty()
@@ -18,7 +22,11 @@ export class UploadGameDto {
 
   @IsString()
   @IsNotEmpty()
-  contentType: string;
+  thumbnailExtension: string;
+
+  @IsString()
+  @IsNotEmpty()
+  thumbnailContentType: string;
 
   @IsString()
   @IsNotEmpty()
